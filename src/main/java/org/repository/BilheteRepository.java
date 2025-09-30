@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface BilheteRepository extends JpaRepository<Bilhete, Long> {
     List<Bilhete> findByRifaId(Long id);
+
+    long countByRifaId(Long rifaId);
 }
