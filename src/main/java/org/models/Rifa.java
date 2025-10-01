@@ -32,15 +32,18 @@ public class Rifa {
     private List<Bilhete> bilhetes;
 
 
-    private Bilhete realizarSorteio(List<Bilhete> bilhetesElegiveis){
+    public Bilhete realizarSorteio(List<Bilhete> bilhetesElegiveis){
         if(Boolean.TRUE.equals(statusSorteio)){
             throw new IllegalStateException("Sorteio já realizado para esta rifa.");
         }
-        if(bilhetesElegiveis.isEmpty() || bilhetesElegiveis == null){
-            throw new IllegalStateException("Nenhum bilhete pago Disponivel para sorteio.");
+        if(bilhetesElegiveis == null || bilhetesElegiveis.isEmpty()){
+            throw new IllegalStateException("Nenhum bilhete pago disponível para sorteio.");
         }
         Bilhete vencedor = bilhetesElegiveis.get(ThreadLocalRandom.current().nextInt(bilhetesElegiveis.size()));
         this.statusSorteio = Boolean.TRUE;
+        if (this.dataFim == null || this.dataFim.isAfter(LocalDateTime.now())) {
+            this.dataFim = LocalDateTime.now();
+        }
         return vencedor;
     }
 

@@ -59,6 +59,10 @@ public class RifaService {
                 .filter(bilhete -> Boolean.TRUE.equals(bilhete.getStatusPagamento()))
                 .collect(Collectors.toList());
 
+        if (bilhetesPagos.isEmpty()) {
+            throw new IllegalStateException("Não há bilhetes pagos disponíveis para realizar o sorteio.");
+        }
+
         Bilhete vencedor = rifa.realizarSorteio(bilhetesPagos);
         rifaRepository.save(rifa);
 

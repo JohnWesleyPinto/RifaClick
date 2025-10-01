@@ -1,11 +1,12 @@
 package org.controller;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.dto.LoginRequest;
 import org.dto.RegisterRequest;
 import org.jwt.JwtTokenProvider;
 import org.models.Usuario;
 import org.repository.UsuarioRepository;
-import org.springframework.aot.hint.annotation.RegisterReflection;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,11 +16,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@RestController
+@RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -27,29 +33,19 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(AuthenticationManager authenticationManager,
-                          UsuarioRepository usuarioRepository,
-                          PasswordEncoder passwordEncoder,
-                          JwtTokenProvider jwtTokenProvider) {
-        this.authenticationManager = authenticationManager;
-        this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
-
     @PostMapping("/login")
-    public ResponseEntity<?> login (@Valid @RequestBody LoginRequest loginResquest){
+    public ResponseEntity<Map<String, Object>> login (@Valid @RequestBody LoginRequest loginResquest){
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getSenha())
+                new UsernamePasswordAuthenticationToken(loginResquest.getEmail(), loginResquest.getSenha())
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtTokenProvider.generateToken(userDetails);
 
-        Optional<Usuario> usuarioOptional = usuarioRepository.findByemail(loginRequest.getEmail());
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(loginResquest.getEmail());
         if (usuarioOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Credenciais inválidas"));
+                    .body(Map.of("mensagem", "Credenciais inválidas"));
         }
 
         Usuario usuario = usuarioOptional.get();
@@ -63,28 +59,28 @@ public class AuthController {
         response.put("token", token);
         response.put("usuario", userData);
 
-        return ResponseEntity.ok(response);return null;
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest){
-        Optional<Usuario> usuarioExistente = usuarioRepository.findByemail(registerRequest.getEmail());
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest registerRequest){
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(registerRequest.getEmail());
         if (usuarioExistente.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "E-mail já cadastrado"));
+                    .body(Map.of("mensagem", "E-mail já cadastrado"));
         }
 
         Usuario usuario = new Usuario();
         usuario.setNome(registerRequest.getNome());
         usuario.setEmail(registerRequest.getEmail());
         usuario.setSenha(passwordEncoder.encode(registerRequest.getSenha()));
-        usuario.setRole("USER");
+        usuario.setRole("ROLE_USER");
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of(
-                        "message", "Usuário registrado com sucesso",
+                        "mensagem", "Usuário registrado com sucesso",
                         "usuarioId", usuarioSalvo.getId()
                 ));
     }

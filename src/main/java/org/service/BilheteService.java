@@ -78,14 +78,8 @@ public class BilheteService {
     }
 
     private void validarPagamento(BilheteDTO bilheteDTO) {
-        if (bilheteDTO == null || bilheteDTO.getStatusPagamento() == null || !bilheteDTO.getStatusPagamento()) {
+        if (bilheteDTO == null || !Boolean.TRUE.equals(bilheteDTO.getStatusPagamento())) {
             throw new IllegalArgumentException("Pagamento não confirmado para o bilhete");
-        }
-        if (bilheteDTO.getRifaId() == null) {
-            throw new IllegalArgumentException("Identificador da rifa é obrigatório");
-        }
-        if (bilheteDTO.getUsuarioId() == null) {
-            throw new IllegalArgumentException("Identificador do usuário é obrigatório");
         }
     }
 

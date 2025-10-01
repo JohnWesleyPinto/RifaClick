@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,11 +16,11 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    private final String SECRET_KEY = "bXlzdXBlcnNlY3JldGtleWZvcmppd3Q=";
+    private static final String SECRET_KEY = "cmlmYWNsaWNrLXN1cGVyLXNlZ3VyYS1jaGF2ZS1za2V5LXNlY3JldC10ZXN0ZQ==";
     private static final long JWT_EXPIRATION_MS = 3600000;
 
     private final UserDetailsService userDetailsService;
-    @Autowired
+
     public JwtTokenProvider(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
@@ -38,7 +37,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    //todo
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -70,10 +69,8 @@ public class JwtTokenProvider {
     }
 
 
-    public String getNomePeloToken(String token) {
-        private Key getSigningKey(){
-            byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-            return Keys.hmacShaKeyFor(keyBytes);
-        }
+    private Key getSigningKey(){
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
