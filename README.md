@@ -23,7 +23,7 @@ Antes de rodar a aplicação, você precisa ter instalado:
 
 - **Java 21+** (ou uma versão mais recente compatível com o Spring Boot 3.x)
 - **Maven** para gerenciar as dependências do projeto
-- **PostgreSQL** ou outro banco de dados relacional configurado (caso você queira rodar a aplicação com banco de dados)
+- **PostgreSQL** ou outro banco de dados relacional configurado 
 - **Spring Boot 3.x** com dependências adequadas.
 
 ---
